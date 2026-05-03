@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is Retrieval-Augmented Generation?",
+    "answer": "RAG is a technique that combines retrieval of relevant documents with language model generation to produce grounded, factually accurate answers.",
+    "contexts": [
+      "Retrieval-Augmented Generation (RAG) enhances LLMs by retrieving relevant documents from a knowledge base before generating an answer, reducing hallucination."
+    ],
+    "ground_truth": "RAG combines document retrieval with generative AI to produce factually grounded responses without hallucination."
+  },
+  {
+    "question": "What is hybrid search in RAG systems?",
+    "answer": "Hybrid search combines dense vector search (semantic similarity) with sparse BM25 keyword search, then fuses results using Reciprocal Rank Fusion for better retrieval coverage.",
+    "contexts": [
+      "Hybrid search merges dense vector retrieval and sparse BM25 keyword retrieval using Reciprocal Rank Fusion (RRF). Vector search handles semantic queries; BM25 handles exact keyword matches like model names or version numbers."
+    ],
+    "ground_truth": "Hybrid search combines vector similarity search and BM25 keyword search, fused with RRF to improve retrieval recall and precision."
+  },
+  {
+    "question": "What is the purpose of a reranker in a RAG pipeline?",
+    "answer": "A reranker is a cross-encoder model that re-scores an initial set of retrieved candidates to surface the most relevant chunks, reducing noise before passing context to the LLM.",
+    "contexts": [
+      "After initial hybrid retrieval fetches 20 candidate chunks, a cross-encoder reranker (BGE-Reranker) scores each chunk against the query and returns only the top 5 most relevant, significantly reducing LLM hallucination from noisy context."
+    ],
+    "ground_truth": "A reranker re-scores retrieved candidates with a cross-encoder model to select the most relevant chunks, improving answer quality by reducing irrelevant context passed to the LLM."
+  },
+  {
+    "question": "What is Reciprocal Rank Fusion?",
+    "answer": "Reciprocal Rank Fusion (RRF) is a rank aggregation algorithm that combines multiple ranked lists by scoring each document as the sum of 1/(rank + k) across all lists, where k is a smoothing constant.",
+    "contexts": [
+      "Reciprocal Rank Fusion assigns each document a score of 1/(rank + k) in each ranked list and sums these across all lists. Documents appearing highly ranked in multiple lists receive the highest fused scores."
+    ],
+    "ground_truth": "RRF is a rank fusion algorithm that combines multiple retrieval result lists by summing reciprocal rank scores, rewarding documents that rank highly across multiple retrievers."
+  },
+  {
+    "question": "What does the self-correction agent do when relevance is low?",
+    "answer": "When the retrieved context scores below the relevance threshold, the self-correction agent rewrites the query using the LLM and retries retrieval, repeating up to the maximum iteration limit.",
+    "contexts": [
+      "The SelfCorrectionAgent grades retrieved context relevance using the LLM. If the score is below the threshold (0.7), the agent uses a query rewriter prompt to reformulate the question and retries retrieval, up to MAX_CORRECTION_ITERATIONS times."
+    ],
+    "ground_truth": "The self-correction agent rewrites the query using the LLM and retries retrieval when the relevance score of retrieved context falls below the configured threshold."
+  },
+  {
+    "question": "What is RAGAS and what metrics does it measure?",
+    "answer": "RAGAS is an evaluation framework for RAG systems that measures Faithfulness (answer grounded in context), Answer Relevancy (answer addresses the question), Context Precision (relevant chunks ranked highly), and Context Recall (all needed information retrieved).",
+    "contexts": [
+      "RAGAS evaluates RAG pipelines across four key metrics: Faithfulness measures whether the answer is supported by the retrieved context; Answer Relevancy measures how well the answer addresses the question; Context Precision measures the ratio of relevant chunks in the retrieved set; Context Recall measures how much of the ground truth is covered by retrieved chunks."
+    ],
+    "ground_truth": "RAGAS measures RAG quality across four metrics: Faithfulness, Answer Relevancy, Context Precision, and Context Recall."
+  },
+  {
+    "question": "What is semantic caching and why is it useful?",
+    "answer": "Semantic caching stores embeddings of past queries in Redis and returns cached answers when a new query is semantically similar above a threshold, avoiding redundant LLM calls and reducing latency and cost.",
+    "contexts": [
+      "The Redis semantic cache embeds each incoming query and performs similarity search against previously answered queries. If a match exceeds the score threshold (0.95), the cached answer is returned immediately without invoking the LLM, reducing both latency and API costs."
+    ],
+    "ground_truth": "Semantic caching matches new queries to past queries by embedding similarity, returning cached answers for near-duplicate questions to reduce LLM calls and latency."
+  },
+  {
+    "question": "What is Docling and why is it used for PDF parsing?",
+    "answer": "Docling is a PDF parsing library that preserves document structure including headings, tables, and captions as structured Markdown, producing higher-quality chunks than naive text extraction.",
+    "contexts": [
+      "Docling parses PDFs while preserving structural elements such as headings, tables, and figure captions. The resulting structured Markdown enables the HybridChunker to produce semantically coherent chunks that respect document hierarchy, leading to better retrieval accuracy."
+    ],
+    "ground_truth": "Docling is used because it preserves PDF document structure including headings and tables, enabling structure-aware chunking that improves retrieval quality."
+  },
+  {
+    "question": "What is the HybridChunker and how does it differ from fixed-size chunking?",
+    "answer": "The HybridChunker from Docling splits documents by semantic structure (headings, paragraphs, tables) and merges small sibling chunks, producing 20-40 meaningful chunks per document instead of arbitrary character-boundary splits.",
+    "contexts": [
+      "Unlike RecursiveCharacterTextSplitter which splits on character count, HybridChunker respects the document's structural hierarchy by splitting at heading and paragraph boundaries. It also merges undersized sibling chunks to avoid tiny fragments, reliably producing 20-40 coherent chunks per 10-15 page document."
+    ],
+    "ground_truth": "HybridChunker uses document structure (headings, paragraphs) to create semantic chunks rather than splitting on fixed character counts, producing more coherent and retrievable text segments."
+  },
+  {
+    "question": "What observability metrics are logged for each query?",
+    "answer": "Each query logs retrieval latency in milliseconds, number of candidates fetched, number of chunks returned, per-chunk BGE-Reranker scores, top chunk preview, iteration count, and whether the self-correction agent converged.",
+    "contexts": [
+      "The RAG pipeline emits structured JSON logs for each query containing: latency_ms (end-to-end retrieval time), candidates_fetched (documents before reranking), chunks_returned (documents after reranking), reranker_scores (per-chunk cross-encoder scores), top_chunk_preview, iterations (self-correction loop count), and converged (whether relevance threshold was met)."
+    ],
+    "ground_truth": "Each query logs latency, candidate counts, reranker scores per chunk, self-correction iteration count, and convergence status as structured JSON."
+  }
+]

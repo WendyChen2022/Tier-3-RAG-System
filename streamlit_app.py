@@ -219,6 +219,7 @@ div[data-testid="stButton"] button:disabled {
 # ─────────────────────────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
 def load_embed_model():
+    # Singleton pattern — model is loaded once and reused across all requests
     from sentence_transformers import SentenceTransformer
     return SentenceTransformer(EMBED_MODEL)
 
@@ -853,6 +854,7 @@ def _init_job() -> None:
 
 def _start_ingest_job(pdf_bytes: bytes, filename: str) -> None:
     """Spin up the worker thread and record the job in session_state."""
+    # Resource management — ThreadPoolExecutor reuses threads to avoid overhead
     q          = queue.Queue()
     cancel_evt = threading.Event()
     result_bag: dict = {}
